@@ -1,4 +1,3 @@
-import moment from 'moment'
 import { checkIsDefAndNotNull, checkState } from 'precond'
 import { generateToken } from './crypto_utils'
 
@@ -24,8 +23,8 @@ export default class OTP {
       options.algorithm = options.algorithm.toLowerCase()
     }
     checkState(
-      SUPPORTED_ALGORITHMS.includes(options.algorithm),
-      `[${options.algorithm}] is not supported`
+        SUPPORTED_ALGORITHMS.includes(options.algorithm),
+        `[${options.algorithm}] is not supported`
     )
     checkIsDefAndNotNull(options.digits, 'digits cannot be null')
     checkIsDefAndNotNull(options.period, 'period cannot be null')
@@ -46,17 +45,16 @@ export default class OTP {
 
   getTimeUntilNextTick() {
     const epoch = this.getEpoch()
-    const difference = moment(this.getTickEnd()).diff(moment(epoch))
-    return Math.floor(moment.duration(difference).asSeconds())
+    const difference = this.getTickEnd().getTime() - epoch
+    return Math.floor(difference / 1000)
   }
 
   getEpoch() {
-    return this.epoch || new Date().getTime()
+    return this.epoch || Date.now()
   }
 
   getCounter(offset = 0) {
-    const counter = Math.floor(this.getEpoch() / this.period / 1000) + offset
-    return counter
+    return Math.floor(this.getEpoch() / this.period / 1000) + offset
   }
 
   getToken(offset = 0) {
@@ -64,3 +62,6 @@ export default class OTP {
     return generateToken(counter, this.algorithm, this.secret, this.digits)
   }
 }
+
+//getTimeUntilNextTick
+//getToken
